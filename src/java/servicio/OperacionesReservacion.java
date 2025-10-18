@@ -200,7 +200,7 @@ public Response agregar(Reservacion u) {
     @DELETE
     @Path("/eliminar/{id}")
     public Response eliminar(@PathParam("id") int ReservacionId) {
-        String sql = "delete from Empleado where empleado_id=?";
+        String sql = "delete from Reservacion where reservacion_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
