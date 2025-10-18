@@ -56,9 +56,7 @@ public class OperacionesHotel {
                 u.setCorreo(rs.getString("correo"));
                 u.setFechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime());
 
-                // Te amo mi vida hermosa <3
-                //  aqui se encuentra el error, para que la lista muestre algo tiene que agregarle algo
-                lista.add(u); // <----- linea faltante
+                lista.add(u);
             }
 
             System.out.println("Registros encontrados: " + lista.size());
@@ -91,7 +89,6 @@ public class OperacionesHotel {
             ps.setString(3, u.getDireccion());
             ps.setString(4, u.getTelefono());
             ps.setString(5, u.getCorreo());
-            ps.executeUpdate();
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
@@ -114,7 +111,7 @@ public class OperacionesHotel {
     @PUT
     @Path("/modificar")
 
-    public int modificar(Hotel u) {
+    public Response modificar(Hotel u) {
         String sql = "update hotel set nombre=?, direccion=?, telefono=?, correo=? where hotel_id=?";
         try {
             con = cn.getConnection();
@@ -124,10 +121,21 @@ public class OperacionesHotel {
             ps.setString(2, u.getDireccion());
             ps.setString(3, u.getTelefono());
             ps.setString(4, u.getCorreo());
-            ps.executeUpdate();
-            return 1;
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Hotel modificado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error Inesperado\"}")
+                        .build();
+            }
         } catch (Exception e) {
-            return 0;
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
 
@@ -159,16 +167,27 @@ public class OperacionesHotel {
 
     @DELETE
     @Path("/eliminar/{id}")
-    public int eliminar(@PathParam("id") int hotel_id) {
+    public Response eliminar(@PathParam("id") int hotel_id) {
         String sql = "delete from hotel where hotel_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setInt(1, hotel_id);
-            ps.executeUpdate();
-            return 1;
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Hotel eliminado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error inesperado\"}")
+                        .build();
+            }
         } catch (Exception e) {
-            return 0;
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
 

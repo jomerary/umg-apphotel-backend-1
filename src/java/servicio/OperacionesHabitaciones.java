@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.core.Response;
 import java.util.HashSet;
 import java.util.Set;
+
 /**
  * REST Web Service
  *
@@ -29,16 +31,18 @@ import java.util.Set;
  */
 @Path("habitaciones")
 public class OperacionesHabitaciones {
+
     Conexion cn = new Conexion();
     Connection con;
     PreparedStatement ps;
     ResultSet rs;
-    
+
     @Context
     private UriInfo context;
+
     public List<Habitaciones> Consultar() {
         List<Habitaciones> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Habitacion";
+        String sql = "SELECT * FROM habitacion";
 
         try {
             con = cn.getConnection();
@@ -50,14 +54,11 @@ public class OperacionesHabitaciones {
                 u.setHabitacionId(rs.getInt("habitacion_id")); // si tu clase tiene este campo
                 u.setHotelId(rs.getInt("hotel_id"));
                 u.setTipoHabitacionId(rs.getInt("tipo_habitacion_id"));
-                u.setNumeroHabitacion(rs.getString("numero_habitacion"));  
-                u.setEstado(rs.getString("estado"));               
+                u.setNumeroHabitacion(rs.getString("numero_habitacion"));
+                u.setEstado(rs.getString("estado"));
                 u.setFechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime());
-                
-                // Te amo mi vida hermosa <3
-                
-                //  aqui se encuentra el error, para que la lista muestre algo tiene que agregarle algo
-                lista.add(u); // <----- linea faltante
+
+                lista.add(u); 
             }
 
             System.out.println("Registros encontrados: " + lista.size());
@@ -67,9 +68,9 @@ public class OperacionesHabitaciones {
         }
 
         return lista;
-     
-        
+
     }
+
     @GET
     @Path("/lista")
     public List<Habitaciones> listar() {
@@ -80,98 +81,122 @@ public class OperacionesHabitaciones {
     @Path("/agregar")
     @Produces("application/json")
     @Consumes("application/json")
-    public int agregar(Habitaciones u) {
-        String sql = "insert into Habitacion (hotel_id ,tipo_habitacion_id ,numero_habitacion, estado) values (?,?,?,?)";
+    public Response agregar(Habitaciones u) {
+        String sql = "insert into habitacion (hotel_id ,tipo_habitacion_id ,numero_habitacion, estado) values (?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
 
-                   
             ps.setInt(1, u.getHotelId());
-            ps.setInt(2, u.getTipoHabitacionId());   
-            ps.setString(3,u.getNumeroHabitacion());
+            ps.setInt(2, u.getTipoHabitacionId());
+            ps.setString(3, u.getNumeroHabitacion());
             ps.setString(4, u.getEstado());
-            ps.executeUpdate();
-            return 1;
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Habitacion creada correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Algo Ocurrio\"}")
+                        .build();
+            }
         } catch (Exception e) {
-            return 0;
-        }
-
-
-    
-}
-    @PUT
-    @Path("/modificar")
-    
-    public int modificar(Habitaciones u){
-        String sql= "update Habitacion set hotel_id=?, tipo_habitacion_id=?, numero_habitacion=?, estado=? where habitacion_id=?";
-        try
-        {
-        con = cn.getConnection();
-        ps=con.prepareStatement(sql);
-        ps.setInt(5, u.getHabitacionId());
-        ps.setInt(1, u.getHotelId());
-        ps.setInt(2, u.getTipoHabitacionId());
-        ps.setString(3, u.getNumeroHabitacion());   
-        ps.setString(4, u.getEstado());
-        ps.executeUpdate();
-        return 1;
-        }catch(Exception e){
-            return 0;
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
+
+    @PUT
+    @Path("/modificar")
+    public Response modificar(Habitaciones u) {
+        String sql = "update habitacion set hotel_id=?, tipo_habitacion_id=?, numero_habitacion=?, estado=? where habitacion_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(5, u.getHabitacionId());
+            ps.setInt(1, u.getHotelId());
+            ps.setInt(2, u.getTipoHabitacionId());
+            ps.setString(3, u.getNumeroHabitacion());
+            ps.setString(4, u.getEstado());
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Habitacion modificada correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Algo Ocurrio\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
+        }
+    }
+
     @GET
     @Path("/consultar/{id}")
-    public List<Habitaciones> consultar (@PathParam("id") int HabitacionId){
+    public List<Habitaciones> consultar(@PathParam("id") int HabitacionId) {
         List<Habitaciones> lista = new ArrayList<>();
-        String sql="select * from Habitacion where habitacion_id=?";
-        try{
+        String sql = "select * from habitacion where habitacion_id=?";
+        try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setInt(1, HabitacionId);
-            rs=ps.executeQuery();
-            while(rs.next())
-            {
+            rs = ps.executeQuery();
+            while (rs.next()) {
                 Habitaciones u = new Habitaciones();
                 u.setHabitacionId(rs.getInt("habitacion_id"));
                 u.setHotelId(rs.getInt("hotel_id"));
                 u.setTipoHabitacionId(rs.getInt("tipo_habitacion_id"));
-                u.setNumeroHabitacion(rs.getString("numero_habitacion"));  
+                u.setNumeroHabitacion(rs.getString("numero_habitacion"));
                 u.setEstado(rs.getString("estado"));
-                
+
                 lista.add(u);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return lista;
-        
+
     }
+
     @DELETE
     @Path("/eliminar/{id}")
-    public int eliminar(@PathParam("id") int habitacion_id){
-        String sql="delete from Habitacion where habitacion_id=?";
-        try{
-            con =cn.getConnection();
-            ps=con.prepareStatement(sql);
+    public Response  eliminar(@PathParam("id") int habitacion_id) {
+        String sql = "delete from Habitacion where habitacion_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
             ps.setInt(1, habitacion_id);
-            ps.executeUpdate();
-            return 1;
-        }catch(Exception e)
-        {
-            return 0;
+             int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Habitacion eliminada correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Algo Ocurrio\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
+    
+
     /**
      * Creates a new instance of OperacionesHotel
      */
     public OperacionesHabitaciones() {
     }
 
-    
-   
 }
-
-
-
-

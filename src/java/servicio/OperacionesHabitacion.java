@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.core.Response;
+
 /**
  * REST Web Service
  *
@@ -27,16 +29,18 @@ import jakarta.ws.rs.DELETE;
  */
 @Path("tipoHabitacion")
 public class OperacionesHabitacion {
+
     Conexion cn = new Conexion();
     Connection con;
     PreparedStatement ps;
     ResultSet rs;
-    
+
     @Context
     private UriInfo context;
+
     public List<TipoHabitacion> Consultar() {
         List<TipoHabitacion> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Tipo_Habitacion";
+        String sql = "SELECT * FROM tipo_habitacion";
 
         try {
             con = cn.getConnection();
@@ -48,13 +52,9 @@ public class OperacionesHabitacion {
                 u.setTipoHabitacionId(rs.getInt("tipo_habitacion_id")); // si tu clase tiene este campo
                 u.setDescripcion(rs.getString("descripcion"));
                 u.setPrecioBase(rs.getDouble("precio_base"));
-                u.setCapacidad(rs.getInt("capacidad"));               
+                u.setCapacidad(rs.getInt("capacidad"));
                 u.setFecha_creacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
-                
-                // Te amo mi vida hermosa <3
-                
-                //  aqui se encuentra el error, para que la lista muestre algo tiene que agregarle algo
-                lista.add(u); // <----- linea faltante
+                lista.add(u);
             }
 
             System.out.println("Registros encontrados: " + lista.size());
@@ -64,9 +64,9 @@ public class OperacionesHabitacion {
         }
 
         return lista;
-     
-        
+
     }
+
     @GET
     @Path("/lista")
     public List<TipoHabitacion> listar() {
@@ -77,93 +77,119 @@ public class OperacionesHabitacion {
     @Path("/agregar")
     @Produces("application/json")
     @Consumes("application/json")
-    public int agregar(TipoHabitacion u) {
-        String sql = "insert into Tipo_Habitacion(descripcion,precio_base,capacidad) values (?,?,?)";
+    public Response agregar(TipoHabitacion u) {
+        String sql = "insert into tipo_habitacion(descripcion,precio_base,capacidad) values (?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
 
-            
             ps.setString(1, u.getDescripcion());
             ps.setDouble(2, u.getPrecioBase());
-            ps.setInt(3, u.getCapacidad());            
-            ps.executeUpdate();
-            return 1;
+            ps.setInt(3, u.getCapacidad());
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Tipo Habitacion creada correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error Inesperado\"}")
+                        .build();
+            }
         } catch (Exception e) {
-            return 0;
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
 
+    }
 
-    
-}
     @PUT
     @Path("/modificar")
-    
-    public int modificar(TipoHabitacion u){
-        String sql= "update Tipo_Habitacion set descripcion=?, precio_base=?, capacidad=? where tipo_habitacion_id=?";
-        try
-        {
-        con = cn.getConnection();
-        ps=con.prepareStatement(sql);
-        ps.setInt(4, u.getTipoHabitacionId());
-        ps.setString(1, u.getDescripcion());
-        ps.setDouble(2, u.getPrecioBase());
-        ps.setInt(3, u.getCapacidad());       
-        ps.executeUpdate();
-        return 1;
-        }catch(Exception e){
-            return 0;
+
+    public Response modificar(TipoHabitacion u) {
+        String sql = "update tipo_habitacion set descripcion=?, precio_base=?, capacidad=? where tipo_habitacion_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(4, u.getTipoHabitacionId());
+            ps.setString(1, u.getDescripcion());
+            ps.setDouble(2, u.getPrecioBase());
+            ps.setInt(3, u.getCapacidad());
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Tipo habitacion actualizado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error inesperado\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
+
     @GET
     @Path("/consultar/{id}")
-    public List<TipoHabitacion> consultar (@PathParam("id") int TipoHabitacionId){
+    public List<TipoHabitacion> consultar(@PathParam("id") int TipoHabitacionId) {
         List<TipoHabitacion> lista = new ArrayList<>();
-        String sql="select * from Tipo_Habitacion where tipo_habitacion_id=?";
-        try{
+        String sql = "select * from tipo_habitacion where tipo_habitacion_id=?";
+        try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
             ps.setInt(1, TipoHabitacionId);
-            rs=ps.executeQuery();
-            while(rs.next())
-            {
+            rs = ps.executeQuery();
+            while (rs.next()) {
                 TipoHabitacion u = new TipoHabitacion();
                 u.setTipoHabitacionId(rs.getInt("tipo_habitacion_id"));
                 u.setDescripcion(rs.getString("descripcion"));
                 u.setPrecioBase(rs.getDouble("precio_base"));
-                u.setCapacidad(rs.getInt("capacidad"));                
+                u.setCapacidad(rs.getInt("capacidad"));
                 lista.add(u);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return lista;
-        
+
     }
+
     @DELETE
     @Path("/eliminar/{id}")
-    public int eliminar(@PathParam("id") int tipo_habitacion_id){
-        String sql="delete from Tipo_Habitacion where tipo_habitacion_id=?";
-        try{
-            con =cn.getConnection();
-            ps=con.prepareStatement(sql);
+    public Response eliminar(@PathParam("id") int tipo_habitacion_id) {
+        String sql = "delete from tipo_habitacion where tipo_habitacion_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
             ps.setInt(1, tipo_habitacion_id);
-            ps.executeUpdate();
-            return 1;
-        }catch(Exception e)
-        {
-            return 0;
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Tipo habitacion eliminado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error inesperado\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
+
     /**
      * Creates a new instance of OperacionesHotel
      */
     public OperacionesHabitacion() {
     }
 
-    
-   
 }
-
-
-
