@@ -38,7 +38,7 @@ public class OperacionesHotel {
     private UriInfo context;
     public List<Hotel> Consultar() {
         List<Hotel> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Hotel";
+        String sql = "SELECT * FROM hotel";
 
         try {
             con = cn.getConnection();
