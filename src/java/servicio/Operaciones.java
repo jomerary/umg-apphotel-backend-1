@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.core.Response;
 
 @Path("generic")
 public class Operaciones {
@@ -71,7 +72,7 @@ public class Operaciones {
     @Path("/agregar")
     @Produces("application/json")
     @Consumes("application/json")
-    public int agregar(Usuarios u) {
+    public Response agregar(Usuarios u) {
         String sql = "insert into usuario(nombre_completo,nombre_usuario,contrasena_hash,rol_usuario) values (?,?,?,?)";
         try {
             con = cn.getConnection();
@@ -82,16 +83,28 @@ public class Operaciones {
             ps.setString(3, u.getContrasenaHash());
             ps.setString(4, u.getRolUsuario());
             ps.executeUpdate();
-            return 1;
+             int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Usuario eliminado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Usuario no encontrado\"}")
+                        .build();
+            }
         } catch (Exception e) {
-            return 0;
+               return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
 
     }
     @PUT
     @Path("/modificar")
     
-    public int modificar(Usuarios u){
+    public Response modificar(Usuarios u){
         String sql= "update usuario set nombre_completo=?, nombre_usuario=?, contrasena_hash=?, rol_usuario=? where usuario_id=?";
         try
         {
@@ -103,9 +116,21 @@ public class Operaciones {
         ps.setString(3, u.getContrasenaHash());
         ps.setString(4, u.getRolUsuario());
         ps.executeUpdate();
-        return 1;
+         int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Usuario eliminado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Usuario no encontrado\"}")
+                        .build();
+            }
         }catch(Exception e){
-            return 0;
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
     @GET
@@ -136,17 +161,29 @@ public class Operaciones {
     }
     @DELETE
     @Path("/eliminar/{id}")
-    public int eliminar(@PathParam("id") int usuario_id){
+    public Response eliminar(@PathParam("id") int usuario_id){
         String sql="delete from usuario where usuario_id=?";
         try{
             con =cn.getConnection();
             ps=con.prepareStatement(sql);
             ps.setInt(1, usuario_id);
             ps.executeUpdate();
-            return 1;
+              int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Usuario eliminado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Usuario no encontrado\"}")
+                        .build();
+            }
         }catch(Exception e)
         {
-            return 0;
+           return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
         }
     }
 

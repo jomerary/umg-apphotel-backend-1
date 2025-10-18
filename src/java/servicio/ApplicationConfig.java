@@ -29,6 +29,7 @@ public class ApplicationConfig extends jakarta.ws.rs.core.Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(Servicio_Progra.GenericResource.class);
         resources.add(servicio.Operaciones.class);
+        resources.add(servicio.OperacionesCliente.class);
         resources.add(servicio.OperacionesHabitacion.class);
         resources.add(servicio.OperacionesHabitaciones.class);
         resources.add(servicio.OperacionesHotel.class);

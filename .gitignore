@@ -1,2 +1,26 @@
+<<<<<<< HEAD
+=======
+# Archivos de build
+/build/
+out/
+target/
+
+# Archivos de NetBeans
+nbproject/private/
+*.iml
+
+# Archivos compilados
+*.class
+
+# Configuración local del IDE
+*.log
+*.swp
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar tu conexión específica si no quieres subirla
+>>>>>>> 5ca3f8112cd7ce750d71dda469a7a82839f81ba7
 /src/java/servicio/Conexion.java
 
