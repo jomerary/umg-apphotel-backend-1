@@ -27,8 +27,8 @@ import jakarta.ws.rs.core.Response;
  *
  * @author merar
  */
-@Path("cliente")
-public class OperacionesCliente {
+@Path("empleado")
+public class OperacionesEmpleado {
 
     Conexion cn = new Conexion();
     Connection con;
@@ -38,9 +38,9 @@ public class OperacionesCliente {
     @Context
     private UriInfo context;
 
-    public List<Cliente> Consultar() {
-        List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Cliente";
+    public List<Empleado> Consultar() {
+        List<Empleado> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Empleado";
 
         try {
             con = cn.getConnection();
@@ -48,13 +48,14 @@ public class OperacionesCliente {
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                Cliente u = new Cliente();
-                u.setClienteId(rs.getInt("cliente_id")); // si tu clase tiene este campo
+                Empleado u = new Empleado();
+                u.setEmpleadoId(rs.getInt("empleado_id")); // si tu clase tiene este campo
+                u.setHotelId(rs.getInt("hotel_id"));
                 u.setNombreCompleto(rs.getString("nombre_completo"));
                 u.setDocumentoIdentidad(rs.getString("documento_identidad"));
+                u.setCargo(rs.getString("cargo"));
                 u.setTelefono(rs.getString("telefono"));
-                u.setCorreo(rs.getString("correo"));
-                u.setDireccion(rs.getString("direccion"));
+                u.setCorreo(rs.getString("correo"));                
                 u.setFechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime());
 
                 //  aqui se encuentra el error, para que la lista muestre algo tiene que agregarle algo
@@ -73,7 +74,7 @@ public class OperacionesCliente {
 
     @GET
     @Path("/lista")
-    public List<Cliente> listar() {
+    public List<Empleado> listar() {
         return (Consultar());
     }
 
@@ -81,23 +82,23 @@ public class OperacionesCliente {
     @Path("/agregar")
     @Produces("application/json")
     @Consumes("application/json")
-    public Response agregar(Cliente u) {
-        String sql = "insert into Cliente(nombre_completo, documento_identidad, telefono, correo, direccion ) values (?,?,?,?,?)";
+    public Response agregar(Empleado u) {
+        String sql = "insert into Empleado ( hotel_id, nombre_completo, documento_identidad, cargo, telefono,correo ) values (?,?,?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
 
-            ps.setString(1, u.getNombreCompleto());
-            ps.setString(2, u.getDocumentoIdentidad());
-            ps.setString(3, u.getTelefono());
-            ps.setString(4, u.getCorreo());
-            ps.setString(5, u.getDireccion());
-
+            ps.setInt(1, u.getHotelId());
+            ps.setString(2, u.getNombreCompleto());
+            ps.setString(3, u.getDocumentoIdentidad());
+            ps.setString(4, u.getCargo());
+            ps.setString(5, u.getTelefono());
+            ps.setString(6, u.getCorreo());
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
                 return Response.ok()
-                        .entity("{\"message\": \"Cliente agregado correctamente\"}")
+                        .entity("{\"message\": \"Empleado agregado correctamente\"}")
                         .build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -115,22 +116,23 @@ public class OperacionesCliente {
     @PUT
     @Path("/modificar")
 
-    public Response modificar(Cliente u) {
-        String sql = "update Cliente set nombre_completo=?, documento_identidad=?, telefono=?, correo=?, direccion=? where cliente_id=?";
+    public Response modificar(Empleado u) {
+        String sql = "update Empleado set hotel_id=?, nombre_completo=?, documento_identidad=?, cargo=?, telefono=?, correo=? where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
-            ps.setInt(6, u.getClienteId());
-            ps.setString(1, u.getNombreCompleto());
-            ps.setString(2, u.getDocumentoIdentidad());
-            ps.setString(3, u.getTelefono());
-            ps.setString(4, u.getCorreo());
-            ps.setString(5, u.getDireccion());
+            ps.setInt(7, u.getEmpleadoId());
+            ps.setInt(1, u.getHotelId());
+            ps.setString(2, u.getNombreCompleto());
+            ps.setString(3, u.getDocumentoIdentidad());
+            ps.setString(4, u.getCargo());
+            ps.setString(5, u.getTelefono());
+            ps.setString(6, u.getCorreo());
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
                 return Response.ok()
-                        .entity("{\"message\": \"Cliente modificado correctamente\"}")
+                        .entity("{\"message\": \"Empleado modificado correctamente\"}")
                         .build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -146,22 +148,24 @@ public class OperacionesCliente {
 
     @GET
     @Path("/consultar/{id}")
-    public List<Cliente> consulta(@PathParam("id") int ClienteId) {
-        List<Cliente> lista = new ArrayList<>();
-        String sql = "select * from Cliente where cliente_id=?";
+    public List<Empleado> consulta(@PathParam("id") int EmpleadoId) {
+        List<Empleado> lista = new ArrayList<>();
+        String sql = "select * from Empleado where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
-            ps.setInt(1, ClienteId);
+            ps.setInt(1, EmpleadoId);
             rs = ps.executeQuery();
             while (rs.next()) {
-                Cliente u = new Cliente();
-                u.setClienteId(rs.getInt("cliente_id"));
+                Empleado u = new Empleado();
+                u.setEmpleadoId(rs.getInt("empleado_id"));
+                u.setHotelId(rs.getInt("hotel_id"));
                 u.setNombreCompleto(rs.getString("nombre_completo"));
                 u.setDocumentoIdentidad(rs.getString("documento_identidad"));
+                u.setCargo(rs.getString("cargo"));
                 u.setTelefono(rs.getString("telefono"));
                 u.setCorreo(rs.getString("correo"));
-                u.setDireccion(rs.getString("direccion"));
+                
                 lista.add(u);
             }
         } catch (Exception e) {
@@ -173,17 +177,17 @@ public class OperacionesCliente {
 
     @DELETE
     @Path("/eliminar/{id}")
-    public Response eliminar(@PathParam("id") int ClienteId) {
-        String sql = "delete from Cliente where cliente_id=?";
+    public Response eliminar(@PathParam("id") int EmpleadoId) {
+        String sql = "delete from Empleado where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
-            ps.setInt(1, ClienteId);
+            ps.setInt(1, EmpleadoId);
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
                 return Response.ok()
-                        .entity("{\"message\": \"Cliente eliminado correctamente\"}")
+                        .entity("{\"message\": \"Empleado eliminado correctamente\"}")
                         .build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
@@ -200,7 +204,7 @@ public class OperacionesCliente {
     /**
      * Creates a new instance of OperacionesHotel
      */
-    public OperacionesCliente() {
+    public OperacionesEmpleado() {
     }
 
 }
