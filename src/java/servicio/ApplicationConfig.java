@@ -34,6 +34,7 @@ public class ApplicationConfig extends jakarta.ws.rs.core.Application {
         resources.add(servicio.OperacionesHabitacion.class);
         resources.add(servicio.OperacionesHabitaciones.class);
         resources.add(servicio.OperacionesHotel.class);
+        resources.add(servicio.OperacionesReservacion.class);
     }
     
 }

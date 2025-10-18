@@ -56,7 +56,7 @@ public class OperacionesEmpleado {
                 u.setCargo(rs.getString("cargo"));
                 u.setTelefono(rs.getString("telefono"));
                 u.setCorreo(rs.getString("correo"));                
-                u.setFechaRegistro(rs.getTimestamp("fecha_registro").toLocalDateTime());
+                u.setFechaRegistro(rs.getTimestamp("fecha_contratacion").toLocalDateTime());
 
                 //  aqui se encuentra el error, para que la lista muestre algo tiene que agregarle algo
                 lista.add(u); // <----- linea faltante
