@@ -1,0 +1,23 @@
+# Archivos de build
+/build/
+out/
+target/
+
+# Archivos de NetBeans
+nbproject/private/
+*.iml
+
+# Archivos compilados
+*.class
+
+# Configuración local del IDE
+*.log
+*.swp
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar tu conexión específica si no quieres subirla
+/src/java/servicio/Conexion.java
+

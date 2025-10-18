@@ -14,9 +14,9 @@ public class Conexion {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/app_hotel_db_v2?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+                "jdbc:mysql://localhost:33060/app_hotel_db_v3?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
                 "root",
-                "admin123"
+                "secret"
             );
             System.out.println("Connection success");
             
