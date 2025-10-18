@@ -34,7 +34,7 @@ public class Operaciones {
 
     public List<Usuarios> Consultar() {
         List<Usuarios> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Usuario";
+        String sql = "SELECT * FROM usuario";
 
         try {
             con = cn.getConnection();
