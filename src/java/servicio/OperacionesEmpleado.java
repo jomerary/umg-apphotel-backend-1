@@ -40,7 +40,7 @@ public class OperacionesEmpleado {
 
     public List<Empleado> Consultar() {
         List<Empleado> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Empleado";
+        String sql = "SELECT * FROM empleado";
 
         try {
             con = cn.getConnection();
@@ -83,7 +83,7 @@ public class OperacionesEmpleado {
     @Produces("application/json")
     @Consumes("application/json")
     public Response agregar(Empleado u) {
-        String sql = "insert into Empleado ( hotel_id, nombre_completo, documento_identidad, cargo, telefono,correo ) values (?,?,?,?,?,?)";
+        String sql = "insert into empleado ( hotel_id, nombre_completo, documento_identidad, cargo, telefono,correo ) values (?,?,?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -117,7 +117,7 @@ public class OperacionesEmpleado {
     @Path("/modificar")
 
     public Response modificar(Empleado u) {
-        String sql = "update Empleado set hotel_id=?, nombre_completo=?, documento_identidad=?, cargo=?, telefono=?, correo=? where empleado_id=?";
+        String sql = "update empleado set hotel_id=?, nombre_completo=?, documento_identidad=?, cargo=?, telefono=?, correo=? where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -150,7 +150,7 @@ public class OperacionesEmpleado {
     @Path("/consultar/{id}")
     public List<Empleado> consulta(@PathParam("id") int EmpleadoId) {
         List<Empleado> lista = new ArrayList<>();
-        String sql = "select * from Empleado where empleado_id=?";
+        String sql = "select * from empleado where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -178,7 +178,7 @@ public class OperacionesEmpleado {
     @DELETE
     @Path("/eliminar/{id}")
     public Response eliminar(@PathParam("id") int EmpleadoId) {
-        String sql = "delete from Empleado where empleado_id=?";
+        String sql = "delete from empleado where empleado_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);

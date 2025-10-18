@@ -82,8 +82,91 @@ public class Operaciones {
             ps.setString(2, u.getNombreUsuario());
             ps.setString(3, u.getContrasenaHash());
             ps.setString(4, u.getRolUsuario());
-            ps.executeUpdate();
-             int rows = ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Usuario Agregado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Error inesperado\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
+        }
+
+    }
+
+    @PUT
+    @Path("/modificar")
+
+    public Response modificar(Usuarios u) {
+        String sql = "update usuario set nombre_completo=?, nombre_usuario=?, contrasena_hash=?, rol_usuario=? where usuario_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(5, u.getUsuarioId());
+            ps.setString(1, u.getNombreCompleto());
+            ps.setString(2, u.getNombreUsuario());
+            ps.setString(3, u.getContrasenaHash());
+            ps.setString(4, u.getRolUsuario());
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                return Response.ok()
+                        .entity("{\"message\": \"Usuario actualizado correctamente\"}")
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\": \"Usuario no encontrado\"}")
+                        .build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/consultar/{id}")
+    public List<Usuarios> consultar(@PathParam("id") int usuario_id) {
+        List<Usuarios> lista = new ArrayList<>();
+        String sql = "select *  from usuario where usuario_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, usuario_id);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Usuarios u = new Usuarios();
+                u.setUsuarioId(rs.getInt("usuario_id"));
+                u.setNombreCompleto(rs.getString("nombre_completo"));
+                u.setNombreUsuario(rs.getString("nombre_usuario"));
+                u.setContrasenaHash(rs.getString("contrasena_hash"));
+                u.setRolUsuario(rs.getString("rol_usuario"));
+                lista.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+
+    }
+
+    @DELETE
+    @Path("/eliminar/{id}")
+    public Response eliminar(@PathParam("id") int usuario_id) {
+        String sql = "delete from usuario where usuario_id=?";
+        try {
+            con = cn.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, usuario_id);
+            int rows = ps.executeUpdate();
 
             if (rows > 0) {
                 return Response.ok()
@@ -95,93 +178,7 @@ public class Operaciones {
                         .build();
             }
         } catch (Exception e) {
-               return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
-                    .build();
-        }
-
-    }
-    @PUT
-    @Path("/modificar")
-    
-    public Response modificar(Usuarios u){
-        String sql= "update usuario set nombre_completo=?, nombre_usuario=?, contrasena_hash=?, rol_usuario=? where usuario_id=?";
-        try
-        {
-        con = cn.getConnection();
-        ps=con.prepareStatement(sql);
-        ps.setInt(5, u.getUsuarioId());
-        ps.setString(1, u.getNombreCompleto());
-        ps.setString(2, u.getNombreUsuario());
-        ps.setString(3, u.getContrasenaHash());
-        ps.setString(4, u.getRolUsuario());
-        ps.executeUpdate();
-         int rows = ps.executeUpdate();
-
-            if (rows > 0) {
-                return Response.ok()
-                        .entity("{\"message\": \"Usuario eliminado correctamente\"}")
-                        .build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"error\": \"Usuario no encontrado\"}")
-                        .build();
-            }
-        }catch(Exception e){
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
-                    .build();
-        }
-    }
-    @GET
-    @Path("/consultar/{id}")
-    public List<Usuarios> consultar (@PathParam("id") int usuario_id){
-        List<Usuarios> lista = new ArrayList<>();
-        String sql="select *  from usuario where usuario_id=?";
-        try{
-            con = cn.getConnection();
-            ps = con.prepareStatement(sql);
-            ps.setInt(1, usuario_id);
-            rs=ps.executeQuery();
-            while(rs.next())
-            {
-                Usuarios u = new Usuarios();
-                u.setUsuarioId(rs.getInt("usuario_id"));
-                u.setNombreCompleto(rs.getString("nombre_completo"));
-                u.setNombreUsuario(rs.getString("nombre_usuario"));
-                u.setContrasenaHash(rs.getString("contrasena_hash"));
-                u.setRolUsuario(rs.getString("rol_usuario"));
-                lista.add(u);
-            }
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return lista;
-        
-    }
-    @DELETE
-    @Path("/eliminar/{id}")
-    public Response eliminar(@PathParam("id") int usuario_id){
-        String sql="delete from usuario where usuario_id=?";
-        try{
-            con =cn.getConnection();
-            ps=con.prepareStatement(sql);
-            ps.setInt(1, usuario_id);
-            ps.executeUpdate();
-              int rows = ps.executeUpdate();
-
-            if (rows > 0) {
-                return Response.ok()
-                        .entity("{\"message\": \"Usuario eliminado correctamente\"}")
-                        .build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("{\"error\": \"Usuario no encontrado\"}")
-                        .build();
-            }
-        }catch(Exception e)
-        {
-           return Response.status(Response.Status.BAD_REQUEST)
                     .entity("{\"error\": \"" + e.getMessage().replace("\"", "\\\"") + "\"}")
                     .build();
         }

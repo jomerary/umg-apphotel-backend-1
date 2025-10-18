@@ -40,7 +40,7 @@ public class OperacionesCliente {
 
     public List<Cliente> Consultar() {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Cliente";
+        String sql = "SELECT * FROM cliente";
 
         try {
             con = cn.getConnection();
@@ -82,7 +82,7 @@ public class OperacionesCliente {
     @Produces("application/json")
     @Consumes("application/json")
     public Response agregar(Cliente u) {
-        String sql = "insert into Cliente(nombre_completo, documento_identidad, telefono, correo, direccion ) values (?,?,?,?,?)";
+        String sql = "insert into cliente(nombre_completo, documento_identidad, telefono, correo, direccion ) values (?,?,?,?,?)";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -116,7 +116,7 @@ public class OperacionesCliente {
     @Path("/modificar")
 
     public Response modificar(Cliente u) {
-        String sql = "update Cliente set nombre_completo=?, documento_identidad=?, telefono=?, correo=?, direccion=? where cliente_id=?";
+        String sql = "update cliente set nombre_completo=?, documento_identidad=?, telefono=?, correo=?, direccion=? where cliente_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -148,7 +148,7 @@ public class OperacionesCliente {
     @Path("/consultar/{id}")
     public List<Cliente> consulta(@PathParam("id") int ClienteId) {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "select * from Cliente where cliente_id=?";
+        String sql = "select * from cliente where cliente_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
@@ -174,7 +174,7 @@ public class OperacionesCliente {
     @DELETE
     @Path("/eliminar/{id}")
     public Response eliminar(@PathParam("id") int ClienteId) {
-        String sql = "delete from Cliente where cliente_id=?";
+        String sql = "delete from cliente where cliente_id=?";
         try {
             con = cn.getConnection();
             ps = con.prepareStatement(sql);
