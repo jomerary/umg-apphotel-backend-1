@@ -1,26 +1,30 @@
-<<<<<<< HEAD
-=======
-# Archivos de build
+# Carpetas de build y compilación
 /build/
-out/
-target/
+/out/
+/dist/
+/target/
 
-# Archivos de NetBeans
-nbproject/private/
-*.iml
-
-# Archivos compilados
+# Archivos compilados de Java
 *.class
 
-# Configuración local del IDE
+# Configuración privada de NetBeans
+nbproject/private/
+nbproject/private/*
+
+# Archivos de proyecto de NetBeans que cambian según la PC
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/project.properties
+nbproject/project.xml
+
+# Ignorar tu archivo de conexión específico
+/src/java/servicio/Conexion.java
+
+# Archivos de logs o temporales
 *.log
 *.swp
-
-# Archivos de sistema
-.DS_Store
+*.DS_Store
 Thumbs.db
-
-# Ignorar tu conexión específica si no quieres subirla
->>>>>>> 5ca3f8112cd7ce750d71dda469a7a82839f81ba7
-/src/java/servicio/Conexion.java
+*.orig
+*.rej
 
